@@ -4,8 +4,11 @@
 
 ### 1.1 Contexte
 
-Ce projet consiste à concevoir et implémenter une base de données relationnelle pour un gestionnaire de collections de cartes.  
-L’objectif est de centraliser l’information liée aux cartes de collection (ex. cartes de hockey, Pokémon, Magic), aux ensembles auxquels elles appartiennent, ainsi qu’aux collections détenues par différents utilisateurs.
+Ce projet consiste à concevoir et implémenter une base de données relationnelle pour un gestionnaire
+de collections de cartes.  
+L’objectif est de centraliser l’information liée aux cartes de collection (ex. cartes de hockey,
+Pokémon, Magic), aux ensembles auxquels elles appartiennent, ainsi qu’aux collections détenues par
+différents utilisateurs.
 
 La base de données pourrait servir de fondation à une application permettant à un collectionneur :
 
@@ -25,11 +28,12 @@ Les objectifs principaux sont :
 - Décrire les **modèles de cartes** faisant partie d’un set.
 - Représenter les **niveaux de rareté** des cartes (commune, rare, parallèle, etc.).
 - Enregistrer les **cartes possédées** par un utilisateur (quantité, état, prix payé).
-- Enregistrer des **transactions** (achats ou ventes/ajouts ou retraits dans le cas d'un échange 
-  par exemple) liées à des 
+- Enregistrer des **transactions** (achats ou ventes/ajouts ou retraits dans le cas d'un échange
+  par exemple) liées à des
   cartes.
 
-Ces informations permettront d’analyser la progression d’un collectionneur dans un set, la valeur de ses cartes, et son historique d’acquisitions.
+Ces informations permettront d’analyser la progression d’un collectionneur dans un set, la valeur de
+ses cartes, et son historique d’acquisitions.
 
 ### 1.3 Fonctionnalités à supporter
 
@@ -55,7 +59,8 @@ Le modèle repose sur **7 entités** :
 3. **SetCarte** : représente une série de cartes appartenant à une année ou édition précise.
 4. **CarteModele** : décrit un modèle de carte faisant partie d’un set.
 5. **Rareté** : décrit le niveau de rareté d’un modèle de carte.
-6. **Possession** : représente qu’un utilisateur possède un exemplaire (ou plusieurs) d’un modèle de carte.
+6. **Possession** : représente qu’un utilisateur possède un exemplaire (ou plusieurs) d’un modèle de
+   carte.
 7. **Transaction** : représente un achat ou une vente d’une carte par un utilisateur.
 
 ### 1.5 Associations principales
@@ -73,18 +78,186 @@ Les associations prévues pour le modèle logique sont :
 ---
 
 ## 2. Modèle logique (DEA)
-![Diagramme logique](diagrammes/collection_cartes_logique.png)
+
+```plantuml
+@startuml
+skinparam linetype ortho
+
+entity utilisateur {
+    * id: integer <<generated>> <<pk>>
+    ---
+    * nom: text
+    * prenom: text
+    * email: text
+    * date_inscription: date
+}
+
+entity rarete {
+    * id: integer <<generated>> <<pk>>
+    ---
+    * nom: text
+}
+
+entity set_carte {
+    * id: integer <<generated>> <<pk>>
+    ---
+    * nom: text
+    * annee: integer
+    * editeur: text
+}
+
+entity carte_modele {
+    * id: integer <<generated>> <<pk>>
+    ---
+    * numero: integer
+    * nom: text
+    * description: text
+}
+
+entity collection {
+    * id: integer <<generated>> <<pk>>
+    ---
+    * nom: text
+    * description: text
+}
+
+entity possession {
+    * id: integer <<generated>> <<pk>>
+    ---
+    * quantite: integer
+    * etat: text
+    * prix_paye: numeric(8,2)
+    * date_acquisition: date
+}
+
+entity transaction {
+    * id: integer <<generated>> <<pk>>
+    ---
+    * type_transaction: text   ' achat / vente
+    * date_transaction: date
+    * montant: numeric(8,2)
+}
+
+' Un utilisateur possède plusieurs collections
+utilisateur " 1" -- "0..*    " collection
+
+' Un utilisateur possède plusieurs cartes via possession
+utilisateur "1 " -- "0..* " possession
+
+' Une collection regroupe plusieurs possessions
+collection "1    " -- "0..*" possession
+
+' Une rareté est associée à plusieurs modèles de cartes
+rarete "1    " -- "0..*" carte_modele
+
+' Un set contient plusieurs modèles de cartes
+set_carte "1" -- "0..*    " carte_modele
+
+' Un modèle de carte peut apparaître dans plusieurs possessions
+carte_modele "1   " --- "0..*" possession
+
+' Un utilisateur fait plusieurs transactions
+utilisateur "1    " -- "0..*" transaction
+
+' Une transaction concerne un modèle de carte
+carte_modele "1" -- "0..*    " transaction
+
+@enduml
+```
 
 ## 3. Modèle physique (relationnel)
-![Diagramme physique](diagrammes/collection_cartes_physique.png)
+
+```plantuml
+@startuml
+skinparam linetype ortho
+
+entity utilisateur {
+    * id: integer <<generated>> <<pk>>
+    ---
+    * nom: text
+    * prenom: text
+    * email: text
+    * date_inscription: date
+}
+
+entity rarete {
+    * id: integer <<generated>> <<pk>>
+    ---
+    * nom: text
+}
+
+entity set_carte {
+    * id: integer <<generated>> <<pk>>
+    ---
+    * nom: text
+    * annee: integer
+    * editeur: text
+}
+
+entity carte_modele {
+    * id: integer <<generated>> <<pk>>
+    ---
+    * numero: integer
+    * nom: text
+    * description: text
+    * id_set: integer <<fk(set_carte)>>
+    * id_rarete: integer <<fk(rarete)>>
+}
+
+entity collection {
+    * id: integer <<generated>> <<pk>>
+    ---
+    * nom: text
+    * description: text
+    * id_utilisateur: integer <<fk(utilisateur)>>
+}
+
+entity possession {
+    * id: integer <<generated>> <<pk>>
+    ---
+    * quantite: integer
+    * etat: text
+    * prix_paye: numeric(8,2)
+    * date_acquisition: date
+    * id_utilisateur: integer <<fk(utilisateur)>>
+    * id_carte: integer <<fk(carte_modele)>>
+    * id_collection: integer <<fk(collection)>>
+}
+
+entity transaction {
+    * id: integer <<generated>> <<pk>>
+    ---
+    * type_transaction: text
+    * date_transaction: date
+    * montant: numeric(8,2)
+    * id_utilisateur: integer <<fk(utilisateur)>>
+    * id_carte: integer <<fk(carte_modele)>>
+}
+
+utilisateur "1" -- "0..*     " collection
+utilisateur "1 " -- "0..* " possession
+collection "1    " -- "0..*" possession
+
+rarete "1   " -- "0..*" carte_modele
+set_carte " 1" -- "0..*   " carte_modele
+
+carte_modele "1  " ---- "0..*" possession
+utilisateur "1    " -- "0..*" transaction
+carte_modele "1" -- "0..*    " transaction
+
+@enduml
+```
 
 ## 4. Scripts SQL
-- `create_collection_cartes.sql`
-- `insert_collection_cartes.sql`
-- `select_collection_cartes.sql`
+
+- `collection_cartes_create.sql`
+- `collection_cartes_insert.sql`
+- `collection_cartes_select.sql`
 
 ## 5. Données de test
+
 *(À venir)*
 
 ## 6. Requêtes SQL de démonstration
+
 *(À venir — minimum 10 requêtes variées)*
