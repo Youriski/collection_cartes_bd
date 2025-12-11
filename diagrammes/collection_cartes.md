@@ -62,28 +62,28 @@ entity transaction {
 }
 
 ' Un utilisateur possède plusieurs collections
-utilisateur "1" -- "0..*" collection
+utilisateur " 1" -- "0..*    " collection
 
 ' Un utilisateur possède plusieurs cartes via possession
-utilisateur "1" -- "0..*" possession
+utilisateur "1 " -- "0..* " possession
 
 ' Une collection regroupe plusieurs possessions
-collection "1" -- "0..*" possession
+collection "1    " -- "0..*" possession
 
 ' Une rareté est associée à plusieurs modèles de cartes
-rarete "1" -- "0..*" carte_modele
+rarete "1    " -- "0..*" carte_modele
 
 ' Un set contient plusieurs modèles de cartes
-set_carte "1" -- "0..*" carte_modele
+set_carte "1" -- "0..*    " carte_modele
 
 ' Un modèle de carte peut apparaître dans plusieurs possessions
-carte_modele "1" --- "0..*" possession
+carte_modele "1   " --- "0..*" possession
 
 ' Un utilisateur fait plusieurs transactions
-utilisateur "1" -- "0..*" transaction
+utilisateur "1    " -- "0..*" transaction
 
 ' Une transaction concerne un modèle de carte
-carte_modele "1" -- "0..*" transaction
+carte_modele "1" -- "0..*    " transaction
 
 @enduml
 ```
@@ -157,16 +157,16 @@ entity transaction {
     * id_carte: integer <<fk(carte_modele)>>
 }
 
-utilisateur "1" -- "0..*" collection
-utilisateur "1" -- "0..*" possession
-collection "1" -- "0..*" possession
+utilisateur "1" -- "0..*     " collection
+utilisateur "1 " -- "0..* " possession
+collection "1    " -- "0..*" possession
 
-rarete "1" -- "0..*" carte_modele
-set_carte "1" -- "0..*" carte_modele
+rarete "1   " -- "0..*" carte_modele
+set_carte " 1" -- "0..*   " carte_modele
 
-carte_modele "1" ---- "0..*" possession
-utilisateur "1" -- "0..*" transaction
-carte_modele "1" -- "0..*" transaction
+carte_modele "1  " ---- "0..*" possession
+utilisateur "1    " -- "0..*" transaction
+carte_modele "1" -- "0..*    " transaction
 
 @enduml
 ```

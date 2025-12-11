@@ -73,10 +73,10 @@ Les associations prévues pour le modèle logique sont :
 ---
 
 ## 2. Modèle logique (DEA)
-*(À venir)*
+![Diagramme logique](diagrammes/collection_cartes_logique.png)
 
 ## 3. Modèle physique (relationnel)
-*(À venir)*
+![Diagramme physique](diagrammes/collection_cartes_physique.png)
 
 ## 4. Scripts SQL
 - `create_collection_cartes.sql`
