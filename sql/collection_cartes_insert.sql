@@ -8,7 +8,8 @@ VALUES ('Lefebvre', 'Maxime', 'maxime.lef@example.com', '2024-01-15'),
        ('Tremblay', 'Alex', 'alex.tremblay@example.com', '2024-03-10'),
        ('Moreau', 'Julie', 'julie.moreau@example.com', '2024-01-28'),
        ('Roy', 'Philippe', 'phil.roy@example.com', '2024-03-20'),
-       ('Lambert', 'Karine', 'karine.lambert@example.com', '2024-04-01');
+       ('Lambert', 'Karine', 'karine.lambert@example.com', '2024-04-01'),
+       ('Dube', 'Martin', 'martin.dube@example.com', '2025-12-11');
 
 
 -- 2. Raretés (Pokémon + Hockey)
