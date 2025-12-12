@@ -253,3 +253,83 @@ carte_modele "1" -- "0..*    " transaction
 - `collection_cartes_create.sql`
 - `collection_cartes_insert.sql`
 - `collection_cartes_select.sql`
+
+## 5. Données de test
+
+La base de données est pré-remplie à l'aide du script `collection_cartes_insert.sql`.  
+Celui-ci ajoute :
+
+- 7 utilisateurs (dont un sans collection, pour tester certaines requêtes)
+- 8 niveaux de rareté
+- 5 séries de cartes (Pokémon et Hockey)
+- 20 modèles de cartes
+- 15 possessions réparties entre plusieurs utilisateurs
+- 15 transactions d’achat, vente ou échange
+
+Ces données permettent de tester des scénarios variés (cartes sans rareté, utilisateurs très actifs,
+séries complètes ou non, etc.).
+
+## 6. Requêtes SQL de démonstration
+
+Voici quelques exemples représentatifs des 10 requêtes incluses dans `collection_cartes_select.sql`.
+
+### Exemples de requêtes
+
+#### Trouver les utilisateurs qui n’ont aucune collection
+
+    SELECT u.prenom, u.nom
+    FROM utilisateur u
+             LEFT JOIN collection c ON c.id_utilisateur = u.id
+    WHERE c.id IS NULL;
+
+#### Lister toutes les possessions avec le nom de l’utilisateur et celui de la carte
+
+    SELECT u.prenom || ' ' || u.nom AS utilisateur,
+           cm.nom                   AS carte,
+           p.quantite,
+           p.etat
+    FROM possession p
+             JOIN utilisateur u ON u.id = p.id_utilisateur
+             JOIN carte_modele cm ON cm.id = p.id_carte
+    ORDER BY utilisateur, carte;
+
+#### Trouver la carte la plus possédée, en gérant les égalités (DENSE_RANK)
+
+    WITH compte AS (SELECT cm.id,
+                           cm.nom,
+                           COALESCE(SUM(p.quantite), 0) AS total
+                    FROM carte_modele cm
+                             LEFT JOIN possession p ON p.id_carte = cm.id
+                    GROUP BY cm.id, cm.nom),
+         ranked AS (SELECT c.*,
+                           DENSE_RANK() OVER (ORDER BY c.total DESC) AS rang
+                    FROM compte c)
+    SELECT id, nom, total
+    FROM ranked
+    WHERE rang = 1;
+
+## 7. Guide d'installation et d'utilisation
+
+Assurez-vous d’avoir PostgreSQL installé sur votre machine (version 17+ recommandée).
+Vous pouvez utiliser psql, pgAdmin ou DataGrip pour exécuter les scripts SQL.
+
+### Installation de la base de données
+
+#### 1. S’assurer que PostgreSQL est installé
+
+PostgreSQL 17+ est recommandé.
+Toute interface SQL peut être utilisée : psql, pgAdmin ou DataGrip.
+
+#### 2. Exécuter les scripts SQL dans l’ordre
+
+##### Créer le schéma et les tables
+
+    sql/collection_cartes_create.sql
+
+##### Insérer les données de test
+
+    sql/collection_cartes_insert.sql
+
+#### Exécuter les requêtes de démonstration
+
+    sql/collection_cartes_select.sql

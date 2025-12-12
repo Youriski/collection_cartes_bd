@@ -13,7 +13,8 @@ WHERE NOT EXISTS (SELECT 1
                   FROM possession p
                   WHERE p.id_carte = cm.id);
 
--- 3. Lister toutes les possessions avec le nom de l'utilisateur et celui de la carte.
+-- 3. Lister toutes les possessions avec le nom de l'utilisateur et celui de la carte, la quantité
+-- possédée et l'état de la carte.
 SELECT u.prenom || ' ' || u.nom AS utilisateur,
        cm.nom                   AS carte,
        p.quantite,
@@ -23,7 +24,7 @@ FROM possession p
          JOIN carte_modele cm ON cm.id = p.id_carte
 ORDER BY utilisateur, carte;
 
--- 4. Trouver toutes les cartes Pokémon (set 1 et 2) avec leur rareté, incluant celles sans rareté.
+-- 4. Trouver toutes les cartes Pokémon (set 1 et 2) avec leur rareté.
 SELECT cm.nom AS carte,
        s.nom  AS set,
        r.nom  AS rarete
@@ -108,11 +109,4 @@ FROM transaction t
          JOIN utilisateur u ON u.id = t.id_utilisateur
          JOIN carte_modele cm ON cm.id = t.id_carte
 ORDER BY categorie_transaction, t.id;
-
--- Test pour requête 9 (temporaire)
-SELECT cm.id, cm.nom, SUM(p.quantite)
-FROM carte_modele cm
-         LEFT JOIN possession p ON p.id_carte = cm.id
-GROUP BY cm.id, cm.nom
-ORDER BY SUM(p.quantite) DESC NULLS LAST;
 
